@@ -1,31 +1,51 @@
+# Define the provider for Kubernetes
 provider "kubernetes" {
-  host                   = var.kubernetes_cluster_endpoint
-  cluster_ca_certificate = base64decode(var.kubernetes_cluster_cert_data)
+cluster_ca_certificate = base64decode(var.kubernetes_cluster_cert_data)
+  host                   = var.kubernetes_cluster_endpoint    
   exec {
-    api_version = "client.authentication.k8s.io/v1alpha1"
+    api_version = "client.authentication.k8s.io/v1beta1"
     command     = "aws-iam-authenticator"
     args        = ["token", "-i", "${var.kubernetes_cluster_name}"]
   }
 }
 
+# Define the Helm provider
 provider "helm" {
-  kubernetes {
-    host                   = var.kubernetes_cluster_endpoint
+   kubernetes {    
     cluster_ca_certificate = base64decode(var.kubernetes_cluster_cert_data)
+    host                   = var.kubernetes_cluster_endpoint
     exec {
-      api_version = "client.authentication.k8s.io/v1alpha1"
+      api_version = "client.authentication.k8s.io/v1beta1"
       command     = "aws-iam-authenticator"
       args        = ["token", "-i", "${var.kubernetes_cluster_name}"]
     }
   }
 }
 
+# Helm release for Argo CD
 resource "helm_release" "argo_cd" {
   name       = "argo-cd"
   repository = "https://argoproj.github.io/argo-helm"
   chart      = "argo-cd"
+  version    = "3.2.3" # specify the version of Argo CD you wish to install
+
+  # Customize Argo CD values here. For example, you can specify a values file or inline values
   set {
     name  = "server.service.type"
     value = "LoadBalancer"
   }
+
+  # More settings...
+}
+
+# Variables
+variable "cluster_name" {
+  description = "The name of the EKS cluster"
+  type        = string
+}
+
+# Outputs
+output "argo_cd_server_url" {
+  description = "The URL to access the Argo CD server"
+  value       = "http://${helm_release.argo_cd.status.load_balancer.ingress[0].hostname}" # Modify according to your setup
 }
