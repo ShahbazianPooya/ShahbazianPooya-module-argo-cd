@@ -1,7 +1,7 @@
 # Define the provider for Kubernetes
 provider "kubernetes" {
-cluster_ca_certificate = base64decode(var.kubernetes_cluster_cert_data)
-  host                   = var.kubernetes_cluster_endpoint    
+  cluster_ca_certificate = base64decode(var.kubernetes_cluster_cert_data)
+  host                   = var.kubernetes_cluster_endpoint
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
     command     = "aws-iam-authenticator"
@@ -11,7 +11,7 @@ cluster_ca_certificate = base64decode(var.kubernetes_cluster_cert_data)
 
 # Define the Helm provider
 provider "helm" {
-   kubernetes {    
+  kubernetes {
     cluster_ca_certificate = base64decode(var.kubernetes_cluster_cert_data)
     host                   = var.kubernetes_cluster_endpoint
     exec {
@@ -36,16 +36,4 @@ resource "helm_release" "argo_cd" {
   }
 
   # More settings...
-}
-
-# Variables
-variable "cluster_name" {
-  description = "The name of the EKS cluster"
-  type        = string
-}
-
-# Outputs
-output "argo_cd_server_url" {
-  description = "The URL to access the Argo CD server"
-  value       = "http://${helm_release.argo_cd.status.load_balancer.ingress[0].hostname}" # Modify according to your setup
 }
