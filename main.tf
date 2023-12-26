@@ -1,8 +1,8 @@
-resource "kubernetes_namespace" "argo-ns" {
-  metadata {
-    name = "argocd"
-  }
-}
+# resource "kubernetes_namespace" "argo-ns" {
+#   metadata {
+#     name = "argocd"
+#   }
+# }
 
 # resource "helm_release" "argocd" {
 #   name       = "msur"
