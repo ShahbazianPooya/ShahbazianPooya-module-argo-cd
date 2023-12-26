@@ -1,7 +1,7 @@
 variable "aws_region" {
   description = "AWS region ID for deployment (e.g. eu-west-1)"
   type        = string
-  default     = "eu-west-2"
+  default     = "eu-west-1"
 }
 
 variable "kubernetes_cluster_id" {
