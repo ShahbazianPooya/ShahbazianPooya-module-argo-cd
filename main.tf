@@ -1,16 +1,16 @@
-# Define the provider for Kubernetes
-# Helm release for Argo CD
-resource "helm_release" "argo_cd" {
-  name       = "argo-cd"
-  repository = "https://argoproj.github.io/argo-helm"
-  chart      = "argo-cd"
-  version    = "3.2.3" # specify the version of Argo CD you wish to install
-
-  # Customize Argo CD values here. For example, you can specify a values file or inline values
-  set {
-    name  = "server.service.type"
-    value = "LoadBalancer"
+resource "kubernetes_namespace" "argo-ns" {
+  metadata {
+    name = "argocd"
   }
+}
 
-  # More settings...
+resource "helm_release" "argocd" {
+  name       = "msur"
+  chart      = "argo-cd"
+  repository = "https://argoproj.github.io/argo-helm"
+  namespace  = "argocd"
+
+  # We are going to access the console with a port forwarded connection, so we'll disable TLS.
+  # This allow us to avoid the self-signed certificate warning for localhosts.
+  # controller.extraArgs = ["insecure"]
 }
